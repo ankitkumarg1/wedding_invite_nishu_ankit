@@ -41,7 +41,8 @@ button {
 
 #experience {
     position: relative;
-    min-height: 100svh;
+    height: calc(100svh - 68px);
+    min-height: 420px;
     overflow: hidden;
     background:
         radial-gradient(ellipse at 50% 90%, rgba(179,117,55,.18), transparent 45%),
@@ -733,6 +734,10 @@ a.venue-btn:hover .venue-arrow {
     }
 }
 
+@media(max-height:520px) {
+    #experience { min-height: 300px; height: calc(100svh - 56px); }
+    #countdown { height: 56px; }
+}
 @media(prefers-reduced-motion:reduce) {
     *,
     *::before,
@@ -743,6 +748,300 @@ a.venue-btn:hover .venue-arrow {
         scroll-behavior: auto !important;
     }
 }
+
+/* ================= COUNTDOWN + CELEBRATION FX ================= */
+#countdown {
+    position: relative;
+    z-index: 8;
+    width: 100%;
+    height: 68px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(10px, 2vw, 22px);
+    padding: 8px 16px;
+    border: 0;
+    border-top: 1px solid rgba(232,201,139,.42);
+    border-bottom: 1px solid rgba(232,201,139,.16);
+    border-radius: 0;
+    color: #ffe9bd;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(190,139,75,.22), transparent 65%),
+      linear-gradient(90deg, #120c0a, #2a1913 50%, #120c0a);
+    box-shadow: 0 -8px 28px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,235,190,.08);
+    font: 10px/1.35 Arial,sans-serif;
+    letter-spacing: 1.8px;
+    text-align: center;
+    pointer-events: none;
+}
+#countdown::before, #countdown::after {
+    content: "✦";
+    color: #e8c98b;
+    font-size: 13px;
+    text-shadow: 0 0 12px rgba(255,213,130,.8);
+    animation: countdownTwinkle 2.8s ease-in-out infinite;
+}
+#countdown::after { animation-delay: 1.4s; }
+@keyframes countdownTwinkle {
+    0%,100% { opacity: .45; transform: scale(.85); }
+    50% { opacity: 1; transform: scale(1.18); }
+}
+#countdown strong {
+    display: inline-block;
+    color: var(--gold);
+    font: 600 clamp(16px, 2.2vw, 21px)/1.3 Georgia,serif;
+    letter-spacing: 1px;
+    text-shadow: 0 0 14px rgba(255,213,130,.55);
+}
+#countdown small { opacity: .82; font-size: 9px; letter-spacing: 2px; }
+#countdown span { opacity: .68; font-size: 9px; letter-spacing: 1.5px; }
+#sparkleCanvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9;
+    pointer-events: none;
+}
+.ambient-glow {
+    position: absolute;
+    inset: -20%;
+    pointer-events: none;
+    z-index: 1;
+    opacity: .45;
+    background: conic-gradient(from 0deg at 50% 50%,
+      transparent, rgba(255,211,133,.08), transparent,
+      rgba(255,244,220,.06), transparent);
+    animation: slowGlow 24s linear infinite;
+}
+@keyframes slowGlow { to { transform: rotate(360deg); } }
+.scene.active .kicker { animation: shimmerText 3.5s ease-in-out infinite; }
+@keyframes shimmerText {
+    0%,100% { text-shadow: 0 0 0 transparent; }
+    50% { text-shadow: 0 0 13px rgba(255,218,150,.65); }
+}
+.invite-frame {
+    border-radius: 5px 5px 22px 22px;
+    box-shadow: 0 25px 90px #000b, 0 0 35px rgba(255,218,150,.18);
+}
+.invite-frame::after {
+    content: "✦  ✧  ✦";
+    display: block;
+    color: #b98b4d;
+    letter-spacing: 12px;
+    font-size: 13px;
+    margin-top: 16px;
+    opacity: .8;
+}
+button.action, a.venue-btn { position: relative; overflow: hidden; }
+button.action::after, a.venue-btn::after {
+    content: "";
+    position: absolute;
+    top: -60%; left: -35%;
+    width: 25%; height: 220%;
+    transform: rotate(25deg);
+    background: rgba(255,255,255,.35);
+    transition: left .65s ease;
+}
+button.action:hover::after, a.venue-btn:hover::after { left: 125%; }
+@media(max-width:560px) {
+    #experience { height: calc(100svh - 62px); }
+    #countdown {
+        height: 62px;
+        gap: 7px;
+        padding: 6px 8px;
+        letter-spacing: 1px;
+    }
+    #countdown strong { font-size: 14px; letter-spacing: .3px; }
+    #countdown small { font-size: 7px; letter-spacing: 1px; }
+    #countdown span { font-size: 7px; letter-spacing: .7px; }
+    #countdown::before, #countdown::after { font-size: 10px; }
+    .top-controls { top: 10px; right: 10px; }
+    .top-controls button { padding: 9px 11px; font-size: 9px; }
+}
+@media(prefers-reduced-motion:reduce) {
+    .ambient-glow, .scene.active .kicker { animation: none !important; }
+}
+
+
+/* ================= TYPOGRAPHY & SPACING POLISH ================= */
+/* Elegant editorial typography with graceful fallbacks */
+:root {
+    --font-display: "Bodoni 72", "Didot", "Baskerville", "Times New Roman", serif;
+    --font-body: "Avenir Next", Avenir, "Segoe UI", Arial, sans-serif;
+}
+body {
+    font-family: var(--font-body);
+    letter-spacing: .01em;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+h1, h2, h3, .gate-title, .courtyard-title, .invite-name {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: .015em;
+}
+.kicker {
+    font-family: var(--font-body);
+    font-size: 10px;
+    letter-spacing: clamp(2px, .45vw, 4px);
+    line-height: 1.7;
+    font-weight: 600;
+}
+.gate-title {
+    line-height: 1.08;
+    letter-spacing: .025em;
+    margin: 12px 0 16px;
+}
+.gate-sub {
+    font-family: var(--font-body);
+    font-size: clamp(13px, 1.6vw, 15px);
+    line-height: 1.9;
+    letter-spacing: .025em;
+    max-width: 440px;
+    padding: 0 12px;
+    margin: 14px auto 28px;
+}
+.gate-caption {
+    padding: 0 22px max(7%, 24px);
+}
+.courtyard-title {
+    line-height: 1.12;
+    letter-spacing: .01em;
+    margin: 18px auto 20px;
+    max-width: 650px;
+}
+.courtyard-copy {
+    font-family: var(--font-body);
+    font-size: clamp(13px, 1.6vw, 15px);
+    line-height: 1.9;
+    letter-spacing: .02em;
+    padding: 0 16px;
+    margin: 0 auto 30px;
+}
+#inviteRoom {
+    padding: clamp(18px, 4vh, 34px) clamp(14px, 3vw, 26px);
+}
+#inviteRoom .scene-content {
+    width: min(100%, 700px);
+    padding: 14px 0;
+}
+.invite-frame {
+    padding: clamp(30px, 5vh, 48px) clamp(22px, 5vw, 54px);
+    border-radius: 7px 7px 24px 24px;
+}
+.invite-ganesh {
+    font-size: 25px;
+    line-height: 1.5;
+    letter-spacing: .08em;
+    margin-bottom: 18px;
+}
+.invite-name {
+    font-size: clamp(39px, 6vw, 62px);
+    line-height: 1.12;
+    letter-spacing: .025em;
+    margin: 18px 0 20px;
+}
+.invite-copy {
+    font-family: var(--font-body);
+    font-size: clamp(13px, 1.6vw, 15px);
+    line-height: 1.9;
+    letter-spacing: .015em;
+    max-width: 470px;
+    margin: 14px auto 22px;
+}
+.progress {
+    gap: 10px;
+    margin: 22px 0 26px;
+}
+.stage-date {
+    font-family: var(--font-body);
+    font-size: 10px;
+    line-height: 1.7;
+    letter-spacing: 2.2px;
+    font-weight: 600;
+}
+.stage-event {
+    padding: 20px 14px;
+    margin: 16px auto;
+    max-width: 460px;
+}
+.stage h3 {
+    font-family: var(--font-display);
+    font-size: clamp(27px, 4vw, 36px);
+    line-height: 1.2;
+    letter-spacing: .015em;
+    margin: 10px 0 12px;
+}
+.stage p {
+    font-family: var(--font-body);
+    font-size: 13px;
+    line-height: 1.9;
+    letter-spacing: .015em;
+    margin-bottom: 4px;
+}
+#finalBlessing {
+    line-height: 1.9;
+    margin-top: 20px;
+}
+.invite-actions {
+    gap: 12px;
+    margin-top: 24px;
+}
+button.action, a.venue-btn {
+    min-height: 50px;
+    padding: 15px 27px !important;
+    font-family: var(--font-body) !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1.7px !important;
+}
+button.action.ghost {
+    padding: 14px 24px !important;
+}
+#countdown {
+    gap: clamp(8px, 1.8vw, 20px);
+    padding: 9px 18px;
+}
+#countdown small {
+    font-family: var(--font-body);
+    font-weight: 600;
+    letter-spacing: 1.8px;
+}
+#countdown strong {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: .04em;
+}
+#countdown span {
+    font-family: var(--font-body);
+    letter-spacing: 1.6px;
+}
+@media(max-width:560px) {
+    .gate-caption { padding: 0 14px 22px; }
+    .gate-title { margin: 10px 0 12px; }
+    .gate-sub { line-height: 1.75; margin: 10px auto 20px; }
+    .courtyard-title { margin: 14px auto 16px; }
+    .courtyard-copy { line-height: 1.75; margin-bottom: 22px; }
+    #inviteRoom { padding: 12px 12px; }
+    #inviteRoom .scene-content { padding: 8px 0; }
+    .invite-frame { padding: 28px 20px; }
+    .invite-ganesh { margin-bottom: 13px; font-size: 22px; }
+    .invite-name { margin: 14px 0 16px; }
+    .invite-copy { line-height: 1.75; margin: 10px auto 16px; }
+    .progress { margin: 17px 0 20px; }
+    .stage-event { padding: 15px 10px; margin: 13px auto; }
+    .stage h3 { margin: 8px 0 10px; }
+    .stage p { font-size: 12px; line-height: 1.75; }
+    .invite-actions { gap: 9px; margin-top: 18px; }
+    .invite-actions button, .invite-actions a {
+        min-width: 128px;
+        padding: 13px 16px !important;
+        letter-spacing: 1.2px !important;
+    }
+}
+
 </style>
 </head>
 
@@ -750,7 +1049,9 @@ a.venue-btn:hover .venue-arrow {
 
 <div id="experience">
 
-    <div class="top-controls">
+    <canvas id="sparkleCanvas" aria-hidden="true"></canvas>
+<div class="ambient-glow" aria-hidden="true"></div>
+<div class="top-controls">
         <button id="skipBtn" type="button">SKIP INTRO</button>
     </div>
 
@@ -985,6 +1286,9 @@ a.venue-btn:hover .venue-arrow {
 
 </div>
 
+<div id="countdown" aria-live="off"><small>COUNTDOWN TO THE WEDDING</small>
+    <strong id="countdownValue">Loading…</strong><span id="countdownLabel">11 DECEMBER 2026</span></div>
+
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -1060,9 +1364,11 @@ document.getElementById("openGate").addEventListener("click", () => {
     startMusic();
 
     gateScene.classList.add("gate-open");
+    transitionSparkleBurst();
 
     setTimeout(() => {
         showScene(courtyard);
+        transitionSparkleBurst();
     }, 1500);
 
 });
@@ -1077,6 +1383,7 @@ function enterInvitation() {
     renderStage();
 
     showScene(inviteRoom);
+    transitionSparkleBurst();
 
     skipBtn.style.display = "none";
 
@@ -1142,6 +1449,7 @@ next.addEventListener("click", () => {
     }
 
     renderStage();
+    transitionSparkleBurst();
 
 });
 
@@ -1283,6 +1591,90 @@ document.getElementById("shareInvite")
 
     });
 
+
+
+/* ================= LIVE WEDDING COUNTDOWN ================= */
+// Counts down to the beginning of the wedding day in the visitor's local time.
+const countdownValue = document.getElementById("countdownValue");
+const weddingDate = new Date(2026, 11, 11, 0, 0, 0);
+function updateCountdown() {
+    const remaining = weddingDate.getTime() - Date.now();
+    if (remaining <= 0) {
+        countdownValue.textContent = "The day is here! ♥";
+        document.getElementById("countdownLabel").textContent = "HAPPY WEDDING DAY";
+        return;
+    }
+    const days = Math.floor(remaining / 86400000);
+    const hours = Math.floor((remaining % 86400000) / 3600000);
+    const minutes = Math.floor((remaining % 3600000) / 60000);
+    const seconds = Math.floor((remaining % 60000) / 1000);
+    countdownValue.textContent = `${days}d ${String(hours).padStart(2,"0")}h ${String(minutes).padStart(2,"0")}m ${String(seconds).padStart(2,"0")}s`;
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+/* ================= SPARKLE / GOLD DUST CANVAS ================= */
+const sparkleCanvas = document.getElementById("sparkleCanvas");
+const sparkleContext = sparkleCanvas.getContext("2d");
+let sparkleParticles = [];
+let sparkleWidth = 0, sparkleHeight = 0;
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function resizeSparkles() {
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    sparkleWidth = window.innerWidth;
+    sparkleHeight = window.innerHeight;
+    sparkleCanvas.width = Math.floor(sparkleWidth * ratio);
+    sparkleCanvas.height = Math.floor(sparkleHeight * ratio);
+    sparkleContext.setTransform(ratio, 0, 0, ratio, 0, 0);
+}
+window.addEventListener("resize", resizeSparkles);
+resizeSparkles();
+
+function addSparkles(x, y, amount = 22) {
+    for (let i = 0; i < amount; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = .5 + Math.random() * 2.8;
+        sparkleParticles.push({
+            x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+            life: 45 + Math.random() * 45, maxLife: 90,
+            size: 1 + Math.random() * 2.8,
+            twinkle: Math.random() * Math.PI * 2
+        });
+    }
+}
+
+function sparkleLoop() {
+    sparkleContext.clearRect(0, 0, sparkleWidth, sparkleHeight);
+    if (!reduceMotion && Math.random() < .32) {
+        addSparkles(Math.random() * sparkleWidth, Math.random() * sparkleHeight, 1);
+    }
+    sparkleParticles = sparkleParticles.filter(p => p.life > 0);
+    for (const p of sparkleParticles) {
+        p.x += p.vx; p.y += p.vy;
+        p.vx *= .985; p.vy *= .985;
+        p.life--;
+        const alpha = Math.max(0, p.life / p.maxLife) * (.45 + .45 * Math.sin(p.twinkle += .12));
+        sparkleContext.beginPath();
+        sparkleContext.fillStyle = `rgba(255, ${205 + Math.floor(Math.random()*35)}, 125, ${alpha})`;
+        sparkleContext.shadowBlur = 12;
+        sparkleContext.shadowColor = "rgba(255,205,115,.9)";
+        sparkleContext.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        sparkleContext.fill();
+    }
+    sparkleContext.shadowBlur = 0;
+    if (!reduceMotion) requestAnimationFrame(sparkleLoop);
+}
+if (!reduceMotion) sparkleLoop();
+
+document.addEventListener("pointerdown", event => {
+    if (event.target.closest("button, a")) addSparkles(event.clientX, event.clientY, 30);
+});
+
+/* A small celebratory burst at each room transition */
+function transitionSparkleBurst() {
+    addSparkles(window.innerWidth / 2, window.innerHeight / 2, 70);
+}
 
 /* Initial stage rendering */
 
