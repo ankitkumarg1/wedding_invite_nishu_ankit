@@ -214,6 +214,9 @@
  document.querySelectorAll(".media-frame video").forEach(video=>{
    const overlay=video.nextElementSibling;
    video.addEventListener("loadeddata",()=>{overlay.style.display="none"});
+   video.addEventListener("error", () => {
+       console.log("Video error:", video.error);
+   });
    video.addEventListener("error",()=>{overlay.style.display="grid"});
  });
  // Gold particle canvas.
