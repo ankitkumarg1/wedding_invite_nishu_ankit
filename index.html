@@ -18,6 +18,8 @@
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+<!-- Preload event GIFs so they begin downloading before their pages are opened. -->
+
 <style>
 
 :root{--gold:#e8c98b;--gold2:#b8894e;--cream:#fff5e4;--wine:#5a2b2b;--dark:#160e0b;--sans:"DM Sans",system-ui,sans-serif;--serif:"Playfair Display",Georgia,serif}
@@ -108,7 +110,24 @@
 
 .media-frame{position:relative;overflow:hidden;width:min(850px,100%);margin:35px auto 24px;aspect-ratio:16/9;border:1px solid #e8c98b88;border-radius:20px;background:linear-gradient(135deg,#5c3428,#1b100d);box-shadow:0 25px 70px #0008}
 
-.media-frame img{width:100%;height:100%;object-fit:cover;display:block;background:#1b100d}
+/* Show a lightweight poster immediately; load the HD MP4 only when its page opens. */
+.media-frame{isolation:isolate;background:#1b100d}
+.media-frame .media-poster{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:contain;display:block;background:#1b100d;transition:opacity .35s ease;
+}
+.media-frame video{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:contain;display:block;background:#1b100d;
+  opacity:0;transition:opacity .35s ease;
+}
+.media-frame video.is-ready{opacity:1}
+.media-frame .media-loading{
+  position:absolute;z-index:2;left:50%;bottom:14px;transform:translateX(-50%);
+  padding:7px 12px;border-radius:99px;background:#160e0bcc;
+  color:#fff0d6;font-size:10px;letter-spacing:.06em;
+}
+.media-frame .media-loading[hidden]{display:none}
 
 .video-placeholder{position:absolute;inset:0;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at center,#805b3b,#271511 70%);color:#f8e3bd}
 
@@ -285,12 +304,13 @@
     <p class="page-intro">Warning: things may get yellow, selfies may get messy, and someone will definitely say “bas thoda sa haldi”! Come ready to laugh, pose and dodge turmeric. 🌼</p>
 
     <div class="media-frame">
-
-      <img src="./haldi.gif" alt="Haldi celebration animation">
-
+      <img class="media-poster" src="./haldi.gif" alt="Haldi celebration preview" decoding="async">
+      <video muted loop playsinline preload="none" poster="./haldi.gif"
+             data-video="./haldi.mp4" aria-label="Haldi celebration video"></video>
+      <div class="media-loading" hidden>Loading HD video…</div>
     </div>
 
-
+    <p class="media-note">HD Haldi video · Keep <strong>haldi.mp4</strong> and <strong>haldi.gif</strong> beside index.html.<br>Official instruction: smile for the camera; unofficial instruction: protect your outfit. 😄</p>
 
     <div class="nav-row"><button class="btn" data-go="mehendiPage">Next: Mehendi →</button></div>
 
@@ -311,12 +331,13 @@
     <p class="page-intro">Beautiful mehendi, music and unlimited photo sessions. Keep your hands busy with henna — and let someone else handle your snacks. 😄🌿</p>
 
     <div class="media-frame">
-
-      <img src="./mehendi.gif" alt="Mehendi celebration animation" loading="lazy">
-
+      <img class="media-poster" src="./mehendi.gif" alt="Mehendi celebration preview" loading="lazy" decoding="async">
+      <video muted loop playsinline preload="none" poster="./mehendi.gif"
+             data-video="./mehendi.mp4" aria-label="Mehendi celebration video"></video>
+      <div class="media-loading" hidden>Loading HD video…</div>
     </div>
 
-    
+    <p class="media-note">HD Mehendi video · Keep <strong>mehendi.mp4</strong> and <strong>mehendi.gif</strong> beside index.html.<br>Pro tip: finish your photos before asking for food. Hands may be occupied. 🌿</p>
 
     <div class="nav-row"><button class="btn" data-go="haldiPage">← Haldi</button><button class="btn" data-go="weddingPage">Next: Wedding →</button></div>
 
@@ -337,11 +358,13 @@
     <p class="page-intro">The big day is here! Two hearts, seven pheras and approximately 700 family photos. Come witness the vows, cheer loudly and save some energy for the dance floor. 🪔</p>
 
     <div class="media-frame">
-
-      <img src="./mandap.gif" alt="Wedding mandap animation" loading="lazy">
-
+      <img class="media-poster" src="./mandap.gif" alt="Wedding mandap preview" loading="lazy" decoding="async">
+      <video muted loop playsinline preload="none" poster="./mandap.gif"
+             data-video="./mandap.mp4" aria-label="Wedding mandap video"></video>
+      <div class="media-loading" hidden>Loading HD video…</div>
     </div>
 
+    <p class="media-note">HD Wedding video · Keep <strong>mandap.mp4</strong> and <strong>mandap.gif</strong> beside index.html.<br>Dance like nobody is recording. (Someone definitely is.) 🪔</p>
 
     <div class="nav-row"><button class="btn" data-go="mehendiPage">← Mehendi</button></div>
 
@@ -359,18 +382,51 @@
 
  const pages=[...document.querySelectorAll(".page")];
 
+ // Load each HD MP4 only when its event page is opened.
+ // The GIF remains visible as a quick poster while the MP4 buffers.
+ function activateVideo(pageId){
+   document.querySelectorAll(".media-frame video").forEach(video=>{
+     const owner=video.closest(".page");
+     if(!owner || owner.id!==pageId){ video.pause(); return; }
+
+     const frame=video.closest(".media-frame");
+     const poster=frame.querySelector(".media-poster");
+     const loading=frame.querySelector(".media-loading");
+
+     if(!video.dataset.loaded){
+       video.dataset.loaded="true";
+       loading.hidden=false;
+       video.src=video.dataset.video;
+       video.load();
+       video.addEventListener("playing",()=>{
+         video.classList.add("is-ready");
+         poster.style.opacity="0";
+         loading.hidden=true;
+       },{once:true});
+       video.addEventListener("error",()=>{
+         loading.hidden=true;
+         video.classList.remove("is-ready");
+         poster.style.opacity="1";
+         console.warn("MP4 unavailable; showing GIF poster:",video.dataset.video);
+       },{once:true});
+     }
+     video.play().catch(()=>{});
+   });
+ }
+
  function showPage(id){
-
    pages.forEach(p=>{p.classList.remove("active");p.style.display="none"});
-
-   const target=document.getElementById(id);target.style.display=id==="templePage"?"grid":"block";
-
+   const target=document.getElementById(id);
+   target.style.display=id==="templePage"?"grid":"block";
    requestAnimationFrame(()=>target.classList.add("active"));
+   target.scrollTop=0;
+   burst(innerWidth/2,innerHeight*.45,55);
 
-   target.scrollTop=0;burst(innerWidth/2,innerHeight*.45,55);
-
-
-
+   if(["haldiPage","mehendiPage","weddingPage"].includes(id)){
+     activateVideo(id);
+   }else{
+     document.querySelectorAll(".media-frame video").forEach(video=>video.pause());
+   }
  }
 
  document.getElementById("openTemple").addEventListener("click",()=>{
